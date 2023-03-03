@@ -92,6 +92,25 @@ class AudioHandle
                                               InterleavingOutputBuffer out,
                                               size_t                   size);
 
+    /** TDM Input buffer
+     ** audio is prepared as 
+     ** this is const, as the user shouldn't modify it
+    */
+    typedef const float* TdmInputBuffer;
+
+    /** TDM Output buffer 
+     ** audio is prepared as 
+    */
+    typedef float* TdmOutputBuffer;
+
+    /** TDM Callback 
+     * TDM audio callbacks in daisy must be of this type
+     */
+    typedef void (*TdmAudioCallback)(TdmInputBuffer  in,
+                                     TdmOutputBuffer out,
+                                     int             numChans,
+                                     size_t          size);
+
     AudioHandle() : pimpl_(nullptr) {}
     ~AudioHandle() {}
 

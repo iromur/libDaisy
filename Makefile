@@ -29,12 +29,14 @@ daisy_field \
 daisy_versio \
 daisy_legio \
 daisy_patch_sm \
+daisy_rogue \
 sys/fatfs \
 sys/system \
 dev/sr_595 \
 dev/codec_ak4556 \
 dev/codec_pcm3060 \
 dev/codec_wm8731 \
+dev/codec_pcm1681 \
 dev/lcd_hd44780 \
 dev/sdram \
 hid/ctrl \

@@ -45,6 +45,7 @@
 #include "dev/apds9960.h"
 #include "dev/codec_pcm3060.h"
 #include "dev/codec_wm8731.h"
+#include "dev/codec_pcm1681.h"
 #include "dev/dps310.h"
 #include "dev/lcd_hd44780.h"
 #include "dev/mcp23x17.h"
