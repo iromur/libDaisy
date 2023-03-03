@@ -503,10 +503,10 @@ extern "C" void DMA1_Stream3_IRQHandler(void)
     HAL_DMA_IRQHandler(&sai_handles[1].sai_a_dma_handle_);
 }
 
-extern "C" void DMA1_Stream4_IRQHandler(void)
-{
-    HAL_DMA_IRQHandler(&sai_handles[1].sai_b_dma_handle_);
-}
+//extern "C" void DMA1_Stream4_IRQHandler(void)
+//{
+//    HAL_DMA_IRQHandler(&sai_handles[1].sai_b_dma_handle_);
+//}
 
 extern "C" void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef* hsai)
 {
