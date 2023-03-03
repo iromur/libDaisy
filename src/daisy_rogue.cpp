@@ -151,6 +151,9 @@ int DaisyRogue::Init(bool boost)
     if(codec.Init(i2c1) != daisy::Pcm1681::Result::OK)
         return 3;
 
+    InitMidi();
+
+
     return 0;
  }
 
@@ -166,6 +169,13 @@ int DaisyRogue::Init(bool boost)
         return 1;
     return 0;
   }
+
+ void DaisyRogue::InitMidi() {
+
+      MidiUartHandler::Config midi_config;
+      midi.Init(midi_config);
+  }
+
 
  //=============================================================================
 //  The following functions pertain to the built-in stereo audio input/output
