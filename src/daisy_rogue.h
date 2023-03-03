@@ -86,14 +86,18 @@ class DaisyRogue
     /** Process digital controls */
     void ProcessDigitalControls();
 
-    DaisySeed     seed;
+    DaisySeed       seed;
+    System          system;
+    MidiUartHandler midi;
+
     SAI_HandleTypeDef hsai_BlockB2;
  
   private:
 
-    System system;
     dsy_gpio seedLed;
     Pcm1681 codec;
+
+    void InitMidi();
 };
 
 } // namespace daisy
