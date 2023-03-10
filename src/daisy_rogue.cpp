@@ -198,6 +198,9 @@ DaisyRogue::Result DaisyRogue::StartRogueAudio(AudioHandle::TdmAudioCallback cb)
 void DaisyRogue::InitMidi() {
 
       MidiUartHandler::Config midi_config;
+      midi_config.transport_config.periph = UartHandler::Config::Peripheral::UART_5;
+      midi_config.transport_config.tx = Pin(PORTB, 6);
+      midi_config.transport_config.rx = Pin(PORTB, 12);
       midi.Init(midi_config);
   }
 
@@ -228,14 +231,17 @@ extern "C" void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
         //    rogueTrap(2);
         gAudioIRQ1_ipFlag = true;
 
+        int32_t * dstPtr = &gAudioOutBuff[0];
         if(callback_ != nullptr) {
             (callback_)(inBuf, outBuf, 8, MIX_BUFF_SAMPLES);
-            for(int s = 0; s < AUDIO_DMA_SIZE; s++) {
-                gAudioOutBuff[s] = f2s32(outBuf[s]);
+            for(int s = 0; s < MIX_BUFF_SAMPLES; s++) {
+                for (int c = 0; c < 8; c++) {
+                    *dstPtr++ = f2s32(outBuf[s + (c * MIX_BUFF_SAMPLES)]);
+                }
             }
-         }
+        }
         SCB_CleanDCache_by_Addr((uint32_t *)&gAudioOutBuff[0], AUDIO_DMA_SIZE * sizeof(uint32_t));
-         gAudioIRQ1_ipFlag = false;
+        gAudioIRQ1_ipFlag = false;
     }
 }
 
@@ -248,10 +254,13 @@ extern "C" void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai)
         //    rogueTrap(2);
         gAudioIRQ2_ipFlag = true;
 
-        if(callback_ != nullptr) {
+        int32_t* dstPtr = &gAudioOutBuff[AUDIO_DMA_SIZE];
+        if (callback_ != nullptr) {
             (callback_)(inBuf, outBuf, 8, MIX_BUFF_SAMPLES);
-            for(int s = 0; s < AUDIO_DMA_SIZE; s++) {
-                gAudioOutBuff[AUDIO_DMA_SIZE + s] = f2s32(outBuf[s]);
+            for (int s = 0; s < MIX_BUFF_SAMPLES; s++) {
+                for (int c = 0; c < 8; c++) {
+                    *dstPtr++ = f2s32(outBuf[s + (c * MIX_BUFF_SAMPLES)]);
+                }
             }
         }
         SCB_CleanDCache_by_Addr((uint32_t *)&gAudioOutBuff[AUDIO_DMA_SIZE], AUDIO_DMA_SIZE * sizeof(uint32_t));
