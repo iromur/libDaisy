@@ -19,7 +19,20 @@ class DaisyRogue
         OK,
         ERR,
     };
- 
+
+    enum
+    {
+        SW_1,    /**< trigger input */
+        SW_2,    /**< trigger input */
+        SW_3,    /**< trigger input */
+        SW_4,    /**< trigger input */
+        SW_5,    /**< trigger input */
+        SW_6,    /**< trigger input */
+        SW_7,    /**< trigger input */
+        SW_8,    /**< trigger input */
+        SW_LAST  /**< & */
+    };
+
     DaisyRogue() {}
     ~DaisyRogue() {}
 
@@ -27,16 +40,19 @@ class DaisyRogue
     Result StartRogueAudio(AudioHandle::TdmAudioCallback cb);
 
     void SetSeedLed(bool state);
-    //void SetDebugOut(bool state);
+    void ProcessDigitalControls();
+    Switch* GetSwitch(size_t idx);
 
     DaisySeed seed;
     System system;
     MidiUartHandler midi;
+    Switch sw[SW_LAST];
     SAI_HandleTypeDef hsai_BlockB2;
  
   private:
 
     dsy_gpio seedLed;
+    dsy_gpio trigger[8];
     Pcm1681 codec;
 
     Result InitRogueAudioHardware();

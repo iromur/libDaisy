@@ -6,9 +6,15 @@ using namespace daisy;
 #define SEED_LED_PORT DSY_GPIOC
 #define SEED_LED_PIN 7
 
-// We can use one of the Rogue's trigger pins for debugging
-//#define DEBUG_OUT_PORT DSY_GPIOA
-//#define DEBUG_OUT_PIN 5
+// Define our 8 trigger inputs as switched
+#define PIN_SW_1 22
+#define PIN_SW_2 21
+#define PIN_SW_3 20
+#define PIN_SW_4 19
+#define PIN_SW_5 18
+#define PIN_SW_6 17
+#define PIN_SW_7 16
+#define PIN_SW_8 15
 
 // Initially, the audio buffer size will be hard-coded for now
 
@@ -25,7 +31,6 @@ bool gAudioIRQ1_ipFlag = false;
 bool gAudioIRQ2_ipFlag = false;
 int32_t DMA_BUFFER_MEM_SECTION gAudioOutBuff[AUDIO_BUFF_SIZE] __attribute__((aligned(32)));
 float gDspBuffer[AUDIO_DMA_SIZE];
-//dsy_gpio debugOut;
 
 AudioHandle::TdmAudioCallback callback_;
 AudioHandle::TdmInputBuffer   inBuf;
@@ -52,13 +57,17 @@ DaisyRogue::Result DaisyRogue::Init(bool boost)
     seedLed.mode     = DSY_GPIO_MODE_OUTPUT_PP;
     dsy_gpio_init(&seedLed);
 
-    //debugOut.pin.port = DEBUG_OUT_PORT;
-    //debugOut.pin.pin  = DEBUG_OUT_PIN;
-    //debugOut.mode     = DSY_GPIO_MODE_OUTPUT_PP;
-    //dsy_gpio_init(&debugOut);
-    //debugOutState = true;
-    //dsy_gpio_write(&debugOut, true);
+    // Initialize our trigger inputs as switches
+    uint8_t sw_pin[] = { PIN_SW_1, PIN_SW_2, PIN_SW_3, PIN_SW_4,
+                         PIN_SW_5, PIN_SW_6, PIN_SW_7,PIN_SW_8 };
 
+    for (size_t i = 0; i < SW_LAST; i++)
+    {
+        dsy_gpio_pin p = seed.GetPin(sw_pin[i]);
+        sw[i].Init(p);
+    }
+
+    // Initialize MIDI and the audio engine
     InitMidi();
     return InitRogueAudioHardware();
  }
@@ -182,10 +191,9 @@ DaisyRogue::Result DaisyRogue::InitRogueAudioHardware(void) {
 }
 
 // ****************************************************************************
-DaisyRogue::Result DaisyRogue::StartRogueAudio(AudioHandle::TdmAudioCallback cb)
- {
+DaisyRogue::Result DaisyRogue::StartRogueAudio(AudioHandle::TdmAudioCallback cb) {
 
-     // register the callback
+    // register the callback
      callback_ = cb;
 
     // Start the audio engine
@@ -205,16 +213,24 @@ void DaisyRogue::InitMidi() {
   }
 
 // ****************************************************************************
-void DaisyRogue::SetSeedLed(bool state)
-{
+void DaisyRogue::SetSeedLed(bool state) {
+
     dsy_gpio_write(&seedLed, state);
 }
 
 // ****************************************************************************
-//void DaisyRogue::SetDebugOut(bool state)
-//{
-//    dsy_gpio_write(&debugOut, state);
-//}
+Switch* DaisyRogue::GetSwitch(size_t idx)
+{
+    return &sw[idx < SW_LAST ? idx : 0];
+}
+
+// ****************************************************************************
+void DaisyRogue::ProcessDigitalControls(void) {
+
+    for (size_t i = 0; i < SW_LAST; i++) {
+        sw[i].Debounce();
+    }
+}
 
 // ****************************************************************************
 extern "C" void DMA1_Stream4_IRQHandler(void)
