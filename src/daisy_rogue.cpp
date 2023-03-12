@@ -6,7 +6,8 @@ using namespace daisy;
 #define SEED_LED_PORT DSY_GPIOC
 #define SEED_LED_PIN 7
 
-// Define our 8 trigger inputs as switched
+// Define our 8 trigger inputs as switches
+
 #define PIN_SW_1 22
 #define PIN_SW_2 21
 #define PIN_SW_3 20
@@ -16,7 +17,7 @@ using namespace daisy;
 #define PIN_SW_7 16
 #define PIN_SW_8 15
 
-// Initially, the audio buffer size will be hard-coded for now
+// The audio buffer size will be hard-coded for now
 
 #define MIX_BUFF_SAMPLES 64
 #define AUDIO_DMA_SIZE (MIX_BUFF_SAMPLES * 8)
@@ -37,8 +38,7 @@ AudioHandle::TdmInputBuffer   inBuf;
 AudioHandle::TdmOutputBuffer  outBuf;
 
 // ****************************************************************************
-DaisyRogue::Result DaisyRogue::Init(bool boost)
-{
+DaisyRogue::Result DaisyRogue::Init(bool boost) {
 
     // Initialize the TDM audio buffer pointers. Because the PCM1682 is a DAC and
     //  has no inputs, we won't be using the input buffer.
@@ -219,8 +219,8 @@ void DaisyRogue::SetSeedLed(bool state) {
 }
 
 // ****************************************************************************
-Switch* DaisyRogue::GetSwitch(size_t idx)
-{
+Switch* DaisyRogue::GetSwitch(size_t idx) {
+
     return &sw[idx < SW_LAST ? idx : 0];
 }
 
@@ -233,16 +233,16 @@ void DaisyRogue::ProcessDigitalControls(void) {
 }
 
 // ****************************************************************************
-extern "C" void DMA1_Stream4_IRQHandler(void)
-{
+extern "C" void DMA1_Stream4_IRQHandler(void) {
+
     HAL_DMA_IRQHandler(&hdma_sai2_blockB);
 }
 
 // *****************************************************************************
-extern "C" void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
-{
-    if(hsai->Instance == SAI2_Block_B)
-    {
+extern "C" void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai) {
+
+    if(hsai->Instance == SAI2_Block_B) {
+
         //if(gAudioIRQ2_ipFlag)
         //    rogueTrap(2);
         gAudioIRQ1_ipFlag = true;
@@ -262,10 +262,10 @@ extern "C" void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 }
 
 // *****************************************************************************
-extern "C" void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai)
-{
-    if(hsai->Instance == SAI2_Block_B)
-    {
+extern "C" void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai) {
+
+    if(hsai->Instance == SAI2_Block_B) {
+
         //if(gAudioIRQ1_ipFlag)
         //    rogueTrap(2);
         gAudioIRQ2_ipFlag = true;
